@@ -25,7 +25,7 @@ start = () => {
   times.finder = setInterval(() => {
     bot.getLounge(() => {
       bot.rooms.forEach((room) => {
-        if (room.language === "en-US") {
+        if (room.language === "ru-RU") {
           if (room.music === true) {
             if (room.description.match("/getmusic")) {
               if (room.total !== room.limit) {
