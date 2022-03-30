@@ -62,7 +62,7 @@ start = () => {
       clearInterval(times.keep);
       clearInterval(times.check);
     }
-  
+
     times.keep = setInterval(() => bot.dm(bot.profile.name, "keep"), 60000*10);
     times.check = setInterval(() => {
         bot.getLoc(() => {
@@ -87,7 +87,7 @@ start = () => {
         bot.event(["new-description"], (u) => {
           bot.getLoc(() => {
             if (!bot.room.description.match("/getmusic")) {
-              delEv();
+              del();
             }
           })
         });
@@ -114,7 +114,7 @@ start = () => {
           })
         });
     })
-  
+
   }
 
 logFunc = () => {
@@ -131,5 +131,5 @@ logFunc = () => {
         log('reloaded');
     }
   }
-  
+
   logFunc();
