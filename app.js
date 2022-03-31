@@ -5,6 +5,7 @@ const log = console.log;
 
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
 var times = {};
+var stat = false;
 
 var bot = new Bot('finder', 'setton', 'en-US');
 
@@ -17,22 +18,31 @@ start = () => {
 
   times.head = setInterval(() => {
     if (!bot.profile) {
-      log("Profile undefined, try login...");
-      logFunc();
+        fs.unlink(`./configfinder.json`, (error) => {
+            if (!error) {
+                delete bot;
+                log("Profile undefined, try login...");
+                logFunc();
+            }
+        });
     }
   }, 60000*10);
 
   times.finder = setInterval(() => {
+    bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
+
     bot.getLounge(() => {
       bot.rooms.forEach((room) => {
+        if (!Object.values(bots).includes(room.roomId)) {
         if (room.language === "ru-RU") {
           if (room.music === true) {
             if (room.description.match("/getmusic")) {
               if (room.total !== room.limit) {
-                check(room.name, room.roomId);
+                if (!stat) { stat = true; check('1', room.name, room.roomId); }
               }
             }
           }
+        }
         }
       })
     })
@@ -42,25 +52,26 @@ start = () => {
 
 }
 
-check = (name, id) => {
-  bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
-  let n = Object.keys(bots).length;
-  if (n < 1 || !n) { scr(1, name, id); }
-  else {
-    n++;
-    let arr = Object.values(bots);
-
-    if ((n !== 6) && !arr.includes(id)) { scr(n, name, id); }
+check = async(num, name, id) => {
+  bots = await JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
+  let k = Object.keys(bots);
+  if(k.includes(num + '')) {
+    num++; check(num, name, id); log('check num:' + num);
+    return;
   }
+  scr(num, name, id);
 }
 
 scr = (num, name, id) => {
-  bots[num] = id;
-  fs.writeFileSync("./conf/bots.json", JSON.stringify(bots));
+    log(Object.keys(bots));
+    log(num);
+    bots[num] = id;
+    fs.writeFileSync("./conf/bots.json", JSON.stringify(bots));
 
-  cmd.run(`pm2 start node --name "M${num}" -- ./scripts/${num}.js`, (err, a, b) => {
+  cmd.run(`pm2 start node --name "M${num}" -- ./scripts/1.js ${Number(num)}`, (err, a, b) => {
     if (!err) {
       log('Bot ' + num + ' join to - ' + name);
+      stat = false;
     } else {
       log('error join');
     }

@@ -4,7 +4,7 @@ const YT = require('../lib/youtube')
 const cmd = require('node-cmd')
 const log = console.log;
 const ytReg = new RegExp("^/m\\s|\\s/m$", "gi");
-const a = 1;
+const a = `${process.argv[2]}`;
 
 var room = JSON.parse(fs.readFileSync(`./scripts/${a}.json`, "utf8"));
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
@@ -17,20 +17,13 @@ var bot;
 del = () => {
     bot.leave(() => {
         clearInterval(times.keep);
-                clearInterval(times.check);
-                Object.keys(bots).find((item) => {
-                    if (bots[item] === room.id) {
-                        delete bots[item];
-                        fs.writeFileSync(`./conf/bots.json`, JSON.stringify(bots));
-                    }
-                });
-                room = {}; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room));
+        clearInterval(times.check);
 
-                fs.unlink(`./config${a}.json`, (error) => {
-                    if (!error) {
-                        delete bot;
-                    }
-                });
+        fs.unlink(`./config${a}.json`, (error) => {
+            if (!error) {
+                delete bot;
+            }
+        });
         cmd.run(`pm2 delete "M${a}"`, (err, a, b) => {
             if (err) {
                 log(`M${a} exit`);
@@ -38,21 +31,29 @@ del = () => {
                 log(`error M${a} exit`);
             }
         });
-        cmd.run('pm2 restart "M"', (e, x, c) => {
-            return;
+        Object.keys(bots).find((item) => {
+            if (bots[item] === room.id) {
+                delete bots[item];
+                fs.writeFileSync(`./conf/bots.json`, JSON.stringify(bots));
+                room = {}; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room));
+            }
         });
     })
 }
 
 randHost = () => {
     bot.getLoc(() => {
-        let users = bot.users;
-        let n = bot.users.length;
-        let r = Math.floor(Math.random() * n);
-        let name = users[r].name;
-        if (name === `M${a}`) { randHost(); return; }
+        if (bot.users.length > 1) {
+            let users = bot.users;
+            let n = bot.users.length;
+            let r = Math.floor(Math.random() * n);
+            let name = users[r].name;
+            if (name === `M${a}`) { randHost(); return; }
 
-        bot.handOver(name);
+            bot.handOver(name);
+        } else {
+            del();
+        }
     })
 }
 
@@ -95,12 +96,7 @@ start = () => {
         bot.event(["new-host"], (u, m, url, trip, e) => {
           bot.getLoc(() => {
             if (e.user === bot.profile.name) {
-              if (bot.users.length > 1) {
-                randHost();
-              }
-              else {
-                del();
-              }
+              randHost();
             }
           })
         });
