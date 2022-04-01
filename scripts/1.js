@@ -43,6 +43,7 @@ del = () => {
 
 randHost = () => {
     bot.getLoc(() => {
+      if (e.user === bot.profile.name) {
         if (bot.users.length > 1) {
             let users = bot.users;
             let n = bot.users.length;
@@ -54,6 +55,7 @@ randHost = () => {
         } else {
             del();
         }
+      }
     })
 }
 
@@ -71,7 +73,8 @@ start = () => {
                 delete bot;
                 logFunc();
             }
-        })
+        });
+        randHost();
     }, 60000);
 
     bot.join(room.id, () => {
@@ -94,11 +97,7 @@ start = () => {
         });
 
         bot.event(["new-host"], (u, m, url, trip, e) => {
-          bot.getLoc(() => {
-            if (e.user === bot.profile.name) {
-              randHost();
-            }
-          })
+            randHost();
         });
 
         bot.event(["kick", "ban"], (u, m, url, trip, e) => {
