@@ -17,15 +17,17 @@ start = () => {
   }
 
   times.head = setInterval(() => {
-    if (!bot.profile) {
-        fs.unlink(`./configfinder.json`, (error) => {
-            if (!error) {
-                delete bot;
-                log("Profile undefined, try login...");
-                logFunc();
-            }
-        });
-    }
+    bot.getProfile((x) => {
+      if (!x) {
+          fs.unlink(`./configfinder.json`, (error) => {
+              if (!error) {
+                  delete bot;
+                  log("Profile undefined, try login...");
+                  logFunc();
+              }
+          });
+      }
+    });
   }, 60000*10);
 
   times.finder = setInterval(() => {
