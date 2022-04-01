@@ -41,9 +41,12 @@ del = () => {
     })
 }
 
-randHost = () => {
+randHost = (e) => {
+    let us = bot.room.users || [];
+    let u = us.find(x => x.name === bot.profile.name);
+
     bot.getLoc(() => {
-      if (e.user === bot.profile.name) {
+      if (bot.room.host === u.id) {
         if (bot.users.length > 1) {
             let users = bot.users;
             let n = bot.users.length;
