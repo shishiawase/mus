@@ -52,7 +52,7 @@ randHost = (e) => {
             let n = bot.users.length;
             let r = Math.floor(Math.random() * n);
             let name = users[r].name;
-            if (name === `M${a}`) { randHost(); return; }
+            if (name === `M`) { randHost(); return; }
 
             bot.handOver(name);
         } else {
