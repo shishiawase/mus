@@ -150,8 +150,10 @@ start = () => {
                     YT(m.replace(ytReg, ""), a, (y) => {
                         log(y);
 
-                        if (trip) { plRule(trip, y); }
-                        else { plRule(u, y); }
+                        if (y.id) {
+                            if (trip) { plRule(trip, y); }
+                            else { plRule(u, y); }
+                        }
 
                         plStop();
                         bot.music(y.title, y.link);
