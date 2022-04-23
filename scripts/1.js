@@ -164,13 +164,19 @@ start = () => {
             }
 
             if (m.match("^/i$")) {
-                let len = Object.keys(userPlaylist[trip].yt).length || Object.keys(userPlaylist[u].yt).length || 0;
+                let len;
+
+                if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
+                else { len = Object.keys(userPlaylist[u].yt).length; }
 
                 if (len >= 25) { bot.print(u + " - всего песен [" + len + "]."); }
             }
 
             if (m.match("^/p$")) {
-                let len = Object.keys(userPlaylist[trip].yt).length || Object.keys(userPlaylist[u].yt).length || 0;
+                let len;
+
+                if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
+                else { len = Object.keys(userPlaylist[u].yt).length; }
 
                 if (len >= 25) {
                     if (trip) { plAddRule(u, trip, len); }
@@ -179,7 +185,10 @@ start = () => {
             }
 
             if (m.match("^/r$")) {
-                let len = Object.keys(userPlaylist[trip].yt).length || Object.keys(userPlaylist[u].yt).length || 0;
+                let len;
+
+                if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
+                else { len = Object.keys(userPlaylist[u].yt).length; }
 
                 if (len >= 25) {
                     if (trip) { plRand(trip); }
@@ -189,7 +198,10 @@ start = () => {
             }
 
             if (m.match("^/s$")) {
-                let len = Object.keys(userPlaylist[trip].yt).length || Object.keys(userPlaylist[u].yt).length || 0;
+                let len;
+
+                if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
+                else { len = Object.keys(userPlaylist[u].yt).length; }
 
                 if (len >= 25) { plStop(); }
             }
