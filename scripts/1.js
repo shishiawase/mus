@@ -181,7 +181,7 @@ start = () => {
             if (m.match("^/r$")) {
                 let len = Object.keys(userPlaylist[trip].yt).length || Object.keys(userPlaylist[u].yt).length || 0;
 
-                if (len >= 2) {
+                if (len >= 25) {
                     if (trip) { plRand(trip); }
                     else { plRand(u); }
                     bot.print("Режим плейлиста(рандом) запущен.");
