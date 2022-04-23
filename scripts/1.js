@@ -149,6 +149,7 @@ start = () => {
                 if (m.match(ytReg)) {
                     YT(m.replace(ytReg, ""), a, (y) => {
                         log(y);
+                        let len = false;
 
                         if (y.id) {
                             if (trip) { plRule(trip, y); }
@@ -157,7 +158,9 @@ start = () => {
 
                         plStop();
                         bot.music(y.title, y.link);
-                        let len = Object.keys(userPlaylist[trip].yt).length || Object.keys(userPlaylist[u].yt).length || 0;
+                        if (Object.keys(userPlaylist[trip].yt).length !== undefined) { len = Object.keys(userPlaylist[trip].yt).length; }
+                        if (Object.keys(userPlaylist[u].yt).length !== undefined) { len = Object.keys(userPlaylist[u].yt).length; }
+                        if (!len) { len = 0 }
                         if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/r - плейлист вразброс.\n/s - остановить режим."); }
                     });
                 }
