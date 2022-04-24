@@ -66,10 +66,12 @@ randHost = (e) => {
 // USER PLAYLIST
 pl = (name, num) => {
     clearTimeout(times.play);
+    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
     let len = Object.keys(userPlaylist[name].yt).length;
     if (num === len) {
         userPlaylist[name].count = 0;
+
         fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
         bot.print("Плейлист завершён.");
         return;
@@ -90,6 +92,7 @@ pl = (name, num) => {
 
 plRand = (u) => {
     clearTimeout(times.play);
+    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
     let len = Object.keys(userPlaylist[u].yt).length;
     let r = Math.floor(Math.random() * len);
@@ -112,6 +115,8 @@ plStop = () => {
 }
 
 plRule = (u, y) => {
+    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
+    
     if (!userPlaylist[u]) { userPlaylist[u] = { yt: {}, count: 0 }; }
     if (!userPlaylist[u].yt[y.id]) {
         userPlaylist[u].yt[y.id] = { title: y.title, time: y.time*1000 };
