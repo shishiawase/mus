@@ -92,7 +92,6 @@ pl = (name, num) => {
 
 plRand = (u) => {
     clearTimeout(times.play);
-    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
     let len = Object.keys(userPlaylist[u].yt).length;
     let r = Math.floor(Math.random() * len);
@@ -116,7 +115,7 @@ plStop = () => {
 
 plRule = (u, y) => {
     userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
-    
+
     if (!userPlaylist[u]) { userPlaylist[u] = { yt: {}, count: 0 }; }
     if (!userPlaylist[u].yt[y.id]) {
         userPlaylist[u].yt[y.id] = { title: y.title, time: y.time*1000 };
@@ -170,6 +169,7 @@ start = () => {
 
             if (m.match("^/i$")) {
                 let len;
+                userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
                 if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
                 else { len = Object.keys(userPlaylist[u].yt).length; }
@@ -179,6 +179,7 @@ start = () => {
 
             if (m.match("^/p$")) {
                 let len;
+                userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
                 if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
                 else { len = Object.keys(userPlaylist[u].yt).length; }
@@ -191,6 +192,7 @@ start = () => {
 
             if (m.match("^/r$")) {
                 let len;
+                userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
                 if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
                 else { len = Object.keys(userPlaylist[u].yt).length; }
@@ -204,6 +206,7 @@ start = () => {
 
             if (m.match("^/s$")) {
                 let len;
+                userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
                 if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
                 else { len = Object.keys(userPlaylist[u].yt).length; }
