@@ -8,9 +8,8 @@ const a = `${process.argv[2]}`;
 
 var room = JSON.parse(fs.readFileSync(`./scripts/${a}.json`, "utf8"));
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
-let b = Object.keys(bots);
-if (!room.length) { room.id = bots[b[b.length - 1]]; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room)); }
-var times = {};
+if (!room.length) { room.id = bots[a]; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room)); }
+var times = { mode: false };
 var userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
 var bot;
@@ -25,18 +24,21 @@ del = () => {
                 delete bot;
             }
         });
+
+        Object.keys(bots).find((item) => {
+            if (bots[item] === room.id) {
+                bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
+                delete bots[item];
+                fs.writeFileSync(`./conf/bots.json`, JSON.stringify(bots));
+                room = {}; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room));
+            }
+        });
+
         cmd.run(`pm2 delete "M${a}"`, (err, a, b) => {
             if (err) {
                 log(`M${a} exit`);
             } else {
                 log(`error M${a} exit`);
-            }
-        });
-        Object.keys(bots).find((item) => {
-            if (bots[item] === room.id) {
-                delete bots[item];
-                fs.writeFileSync(`./conf/bots.json`, JSON.stringify(bots));
-                room = {}; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room));
             }
         });
     })
@@ -64,53 +66,60 @@ randHost = (e) => {
 }
 
 // USER PLAYLIST
-pl = (name, num) => {
-    clearTimeout(times.play);
-    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
+let curPl = {};
 
-    let len = Object.keys(userPlaylist[name].yt).length;
-    if (num === len) {
-        userPlaylist[name].count = 0;
-
-        fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
-        bot.print("Плейлист завершён.");
-        return;
-    }
-
-    let ids = Object.keys(userPlaylist[name].yt);
-    let t = userPlaylist[name].yt[ids[num]].time + 5000;
-
-    YT("https://youtu.be/" + ids[num], a, (y) => {
-        bot.music(y.title, y.link, () => {
-            userPlaylist[name].count = num;
-            fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
-            num++;
-            times.play = setTimeout(() => pl(name, num), t);
-        })
-    });
+shuffle = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 plRand = (u) => {
     clearTimeout(times.play);
 
-    let len = Object.keys(userPlaylist[u].yt).length;
-    let r = Math.floor(Math.random() * len);
-    let ids = Object.keys(userPlaylist[u].yt);
-    let t = userPlaylist[u].yt[ids[r]].time + 5000;
+    if (!curPl.ids) {
+        curPl.n = u;
+        curPl.len = Object.keys(userPlaylist[u].yt).length;
+        curPl.ids = Object.keys(userPlaylist[u].yt);
+        shuffle(curPl.ids);
+        curPl.count = 0;
+    }
 
-    YT("https://youtu.be/" + ids[r], a, (y) => {
-        bot.music(y.title, y.link, () => {
-            times.play = setTimeout(() => plRand(u), t);
-        })
-    });
+    if (curPl.count < curPl.len) {
+        let ids = curPl.ids[curPl.count];
+        let t = userPlaylist[u].yt[ids].time + 5000;
+
+        YT("https://youtu.be/" + ids, a, (y) => {
+            bot.music(y.title, y.link, () => {
+                curPl.count++;
+                curPl.id = ids;
+                times.play = setTimeout(() => plRand(u), t);
+            })
+        }); return;
+    }
+
+    curPl.count = 0;
+    plRand(u);
 }
 
 plStop = () => {
+    times.mode = false;
+    curPl = {};
+
     if (times.play) {
         clearTimeout(times.play);
         delete times.play;
-        bot.print("Плейлист остановлен.");
+        bot.print("playlist mode ❌");
     }
+}
+
+plDel = (u) => {
+    let title = userPlaylist[u].yt[curPl.id].title;
+
+    delete userPlaylist[u].yt[curPl.id];
+    fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
+    bot.print(title + " 🗑️");
 }
 
 plRule = (u, y) => {
@@ -121,12 +130,6 @@ plRule = (u, y) => {
         userPlaylist[u].yt[y.id] = { title: y.title, time: y.time*1000 };
         fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
     }
-}
-
-plAddRule = (u, t, len) => {
-    if (userPlaylist[t].count === 0) { bot.print(`Режим плейлиста запущен.\n${u} - количество песен [${len}].`); pl(t, 0); return; }
-    bot.print(`Плейлист запущен с последней проигранной песни.\n[${userPlaylist[t].count}/${len}]`);
-    pl(t, userPlaylist[t].count);
 }
 
 start = () => {
@@ -152,17 +155,22 @@ start = () => {
             if (m.match("/m")) {
                 if (m.match(ytReg)) {
                     YT(m.replace(ytReg, ""), a, (y) => {
+
                         log(y);
                         let len;
+                        let n;
 
                         if (y.id) {
-                            if (trip) { plRule(trip, y); len = Object.keys(userPlaylist[trip].yt).length; }
-                            else { plRule(u, y); len = Object.keys(userPlaylist[u].yt).length; }
+                            if (trip) { plRule(trip, y); len = Object.keys(userPlaylist[trip].yt).length; n = trip; }
+                            else { plRule(u, y); len = Object.keys(userPlaylist[u].yt).length; n = u; }
                         }
 
-                        plStop();
-                        bot.music(y.title, y.link);
-                        if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/r - плейлист вразброс.\n/s - остановить режим."); }
+                        if (times.mode) {
+                            clearTimeout(times.play);
+                            bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000));
+                        } else { bot.music(y.title, y.link); }
+
+                        if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/s - остановить режим.\n/d - удалить текущий трек.\n/n - следующий."); }
                     });
                 }
             }
@@ -185,33 +193,52 @@ start = () => {
                 else { len = Object.keys(userPlaylist[u].yt).length; }
 
                 if (len >= 25) {
-                    if (trip) { plAddRule(u, trip, len); }
-                    else { plAddRule(u, u, len); }
-                }
-            }
+                    if (times.mode) { bot.print("[playlist mode] - уже активен."); return; }
+                    times.mode = true;
+                    curPl = {};
 
-            if (m.match("^/r$")) {
-                let len;
-                userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
-
-                if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
-                else { len = Object.keys(userPlaylist[u].yt).length; }
-
-                if (len >= 25) {
                     if (trip) { plRand(trip); }
                     else { plRand(u); }
-                    bot.print("Режим плейлиста(рандом) запущен.");
+                    bot.print("playlist mode ✔️");
                 }
             }
 
-            if (m.match("^/s$")) {
-                let len;
-                userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
+            if (times.mode) {
+                if (m.match("^/s$")) {
+                    let len;
+                    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
-                if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
-                else { len = Object.keys(userPlaylist[u].yt).length; }
+                    if (trip) { len = Object.keys(userPlaylist[trip].yt).length; }
+                    else { len = Object.keys(userPlaylist[u].yt).length; }
 
-                if (len >= 25) { plStop(); }
+                    if (len >= 25) { plStop(); }
+                }
+
+                if (m.match("^/d$")) {
+                    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
+                    let len;
+                    let p;
+
+                    if (trip) { len = Object.keys(userPlaylist[trip].yt).length; p = trip; }
+                    else { len = Object.keys(userPlaylist[u].yt).length; p = u;}
+
+                    if (len >= 25) {
+                        if (p === curPl.n) { plDel(p); }
+                    }
+                }
+
+                if (m.match("^/n$")) {
+                    userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
+                    let len;
+                    let p;
+
+                    if (trip) { len = Object.keys(userPlaylist[trip].yt).length; p = trip; }
+                    else { len = Object.keys(userPlaylist[u].yt).length; p = u;}
+
+                    if (len >= 25) {
+                        if (p === curPl.n) { plRand(p); }
+                    }
+                }
             }
         });
 

@@ -54,10 +54,10 @@ start = () => {
 
 }
 
-check = async(num, name, id) => {
-  bots = await JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
+check = (num, name, id) => {
+  bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
   let k = Object.keys(bots);
-  if(k.includes(num + '')) {
+  if(k.includes(num)) {
     num++; check(num, name, id); log('check num:' + num);
     return;
   }
