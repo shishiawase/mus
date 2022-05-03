@@ -32,15 +32,16 @@ start = () => {
 
   times.finder = setInterval(() => {
     bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
+    let o = Object.keys(bots);
 
     bot.getLounge(() => {
       bot.rooms.forEach((room) => {
-        if (!Object.values(bots).includes(room.roomId)) {
-        if (room.language === "ru-RU") {
+        if (!o.includes(room.roomId)) {
+        if (room.language === "en-US") {
           if (room.music === true) {
             if (room.description.match("/getmusic")) {
               if (room.total !== room.limit) {
-                if (!stat) { stat = true; check('1', room.name, room.roomId); }
+                if (!stat) { stat = true; scr(room.name, room.roomId); }
               }
             }
           }
@@ -54,25 +55,14 @@ start = () => {
 
 }
 
-check = (num, name, id) => {
-  bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
-  let k = Object.keys(bots);
-  if(k.includes(num)) {
-    num++; check(num, name, id); log('check num:' + num);
-    return;
-  }
-  scr(num, name, id);
-}
-
-scr = (num, name, id) => {
+scr = (name, id) => {
     log(Object.keys(bots));
-    log(num);
-    bots[num] = id;
+    bots[id] = name;
     fs.writeFileSync("./conf/bots.json", JSON.stringify(bots));
 
-  cmd.run(`pm2 start node --name "M${num}" -- ./scripts/1.js ${Number(num)}`, (err, a, b) => {
+  cmd.run(`pm2 start node --name "M${id}" -- ./scripts/1.js ${id}`, (err, a, b) => {
     if (!err) {
-      log('Bot ' + num + ' join to - ' + name);
+      log('Bot ' + id + ' join to - ' + name);
       stat = false;
     } else {
       log('error join');
@@ -81,10 +71,10 @@ scr = (num, name, id) => {
 }
 
 logFunc = () => {
-  if (!bot.load('finder')) {
+  if (!bot.load('./finder')) {
       bot.login(() => {
           log("Login ok");
-          bot.save('finder');
+          bot.save('./finder');
           start();
       })
   } else {

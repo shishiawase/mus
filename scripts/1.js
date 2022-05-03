@@ -4,44 +4,35 @@ const YT = require('../lib/youtube')
 const cmd = require('node-cmd')
 const log = console.log;
 const ytReg = new RegExp("^/m\\s|\\s/m$", "gi");
-const a = `${process.argv[2]}`;
+const a = process.argv[2];
 
-var room = JSON.parse(fs.readFileSync(`./scripts/${a}.json`, "utf8"));
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
-if (!room.length) { room.id = bots[a]; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room)); }
-var times = { mode: false };
+var times = { mode: false, exit: false };
 var userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
 
 var bot;
 
 del = () => {
+    if (!times.exit) { setTimeout(() => del(), 2000); return; }
+
     bot.leave(() => {
-        clearInterval(times.keep);
-        clearInterval(times.check);
-
-        fs.unlink(`./config${a}.json`, (error) => {
-            if (!error) {
-                delete bot;
-            }
-        });
-
+        fs.unlinkSync(`./conf/${a}.json`);
         Object.keys(bots).find((item) => {
-            if (bots[item] === room.id) {
+            if (item === a) {
                 bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
                 delete bots[item];
                 fs.writeFileSync(`./conf/bots.json`, JSON.stringify(bots));
-                room = {}; fs.writeFileSync(`./scripts/${a}.json`, JSON.stringify(room));
             }
         });
 
         cmd.run(`pm2 delete "M${a}"`, (err, a, b) => {
-            if (err) {
+            if (!err) {
                 log(`M${a} exit`);
             } else {
                 log(`error M${a} exit`);
             }
         });
-    })
+    });
 }
 
 randHost = (e) => {
@@ -150,7 +141,9 @@ start = () => {
         randHost();
     }, 60000);
 
-    bot.join(room.id, () => {
+    bot.join(a, () => {
+        setTimeout(() => times.exit = true, 8500);
+
         bot.event(["msg", "dm"], (u, m, url, trip, e) => {
             if (m.match("/m")) {
                 if (m.match(ytReg)) {
@@ -269,10 +262,10 @@ start = () => {
 logFunc = () => {
     bot = new Bot('M', 'setton', 'en-US');
 
-    if (!bot.load(a)) {
+    if (!bot.load(`./conf/${a}`)) {
         bot.login(() => {
             log("Login ok");
-            bot.save(a);
+            bot.save(`./conf/${a}`);
             start();
         })
     } else {
