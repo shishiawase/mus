@@ -36,7 +36,7 @@ start = () => {
 
     bot.getLounge(() => {
       bot.rooms.forEach((room) => {
-        if (!o.includes(room.roomId)) {
+        if (!o.includes(room.roomId) && o.length <= 5) {
         if (room.language === "en-US") {
           if (room.music === true) {
             if (room.description.match("/getmusic")) {
