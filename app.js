@@ -1,4 +1,4 @@
-const { Bot, listen } = require('./lib/bot.js')
+const { Bot } = require('./lib/bot.js')
 const fs = require('fs')
 const cmd = require('node-cmd')
 const log = console.log;
