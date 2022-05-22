@@ -101,7 +101,7 @@ plMode = (u) => {
         curPl.n = u.name; curPl.t = u.title; curPl.l = u.yt; curPl.len = u.yt.length;
         shuffle(curPl.l);
         curPl.c = 0;
-        bot.print('playlist: ' + curPl.t + '\nauthor: ' + curPl.n);
+        bot.print('playlist: ' + curPl.t + '\nauthor: ' + curPl.n + '\n[' + u.yt.length + ']');
     }
 
     if (curPl.c < curPl.len) {
