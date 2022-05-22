@@ -105,7 +105,7 @@ plMode = (u) => {
     }
 
     if (curPl.c < curPl.len) {
-        let l = curPl.l[curPl.count];
+        let l = curPl.l[curPl.c];
 
         YT("https://youtu.be/" + l, a, (y) => {
             let t = y.time*1000+5000;
