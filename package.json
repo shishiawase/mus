@@ -5,6 +5,7 @@
     "concat-stream": "^2.0.0",
     "form-data": "^4.0.0",
     "node-cmd": "^5.0.0",
+    "pastebin-api": "^4.0.1",
     "yt-search": "^2.10.3"
   }
 }

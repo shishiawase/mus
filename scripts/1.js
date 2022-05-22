@@ -5,6 +5,7 @@ const cmd = require('node-cmd')
 const log = console.log;
 const ytReg = new RegExp("^/m\\s|\\s/m$", "gi");
 const a = process.argv[2];
+const PasteClient = require("pastebin-api").default;
 
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
 var times = { mode: false, exit: false };
@@ -58,6 +59,24 @@ randHost = (e) => {
 
 // USER PLAYLIST
 let curPl = {};
+
+pasteList = async(yt, u, callback) => {
+    const client = new PasteClient("qg8xey_GHD36nl02BFVRKs4UihbtC0uO");
+    let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: /d 1 5 19 (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
+
+    Object.keys(yt).forEach((x, i) => {
+        text += ((i + 1) + '. ' + x.title + '\n');
+    });
+
+    const url = await client.createPaste({
+        code: text,
+        expireDate: '10M',
+        name: `${u}.txt`,
+        publicity: 1,
+    });
+
+    return callback(url);
+}
 
 shuffle = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -130,8 +149,21 @@ plStop = () => {
     delete times.play;
 }
 
-plDel = (u) => {
+plDel = (u, m) => {
     if (times['mode+']) { return; }
+    if (!m.match("^/d$")) {
+        let num = m.substring(2).split(/\s/);
+
+        num.forEach(x => Object.keys(userPlaylist[u].yt).find((i, ind) => {
+            if ((ind + 1) === x) { delete userPlaylist[u].yt[i]; }
+        }));
+        fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
+        bot.print('Песни удалены 🗑️');
+        return;
+    }
+
+    if (!times.mode) { return; }
+
     let title = userPlaylist[u].yt[curPl.id].title;
 
     delete userPlaylist[u].yt[curPl.id];
@@ -194,7 +226,11 @@ start = () => {
             }
 
             if (m.match("^/i$")) {
-                if (len >= 25) { bot.print(u + " - всего песен [" + len + "]."); }
+                if (len >= 25) {
+                    pasteList(userPlaylist[user].yt, u, (link) => {
+                        bot.print(u + " - всего песен [" + len + "].", link);
+                    });
+                }
             }
 
             if (m.match("^/p$")) {
@@ -219,16 +255,16 @@ start = () => {
                 });
             }
 
+            if (m.match("^/d")) {
+                if (len >= 25) {
+                    if (user === curPl.n) { plDel(user, m); }
+                }
+            }
+
             if (times.mode) {
 
                 if (m.match("^/s$")) {
                     plStop(); bot.print("playlist mode ❌");
-                }
-
-                if (m.match("^/d$")) {
-                    if (len >= 25) {
-                        if (user === curPl.n) { plDel(user); }
-                    }
                 }
 
                 if (m.match("^/n$")) {
