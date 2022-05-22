@@ -62,7 +62,7 @@ let curPl = {};
 
 pasteList = async(yt, u, callback) => {
     const client = new PasteClient("qg8xey_GHD36nl02BFVRKs4UihbtC0uO");
-    let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: /d 1 5 19 (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
+    let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: "/d 1 5 19" (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
 
     Object.keys(yt).forEach((x, i) => {
         let b;
@@ -160,7 +160,7 @@ plDel = (u, m) => {
     if (times['mode+']) { return; }
     if (!m.match("^/d$")) {
         let num = m.substring(2).split(/\s/).filter(x => x !== '');
-        
+
         num.forEach(x => Object.keys(userPlaylist[u].yt).find((i, ind) => {
             if ((x - 1) === ind) { delete userPlaylist[u].yt[i]; }
         }));
