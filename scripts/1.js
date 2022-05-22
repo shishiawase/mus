@@ -66,7 +66,9 @@ pasteList = async(yt, u, callback) => {
     let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: /d 1 5 19 (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
 
     Object.keys(yt).forEach((x, i) => {
-        text += ((i + 1) + '. ' + x.title + '\n');
+        let t = (i + 1) + '. ' + x.title + '\n';
+        console.log(t);
+        text += t;
     });
 
     const url = await client.createPaste({
