@@ -264,7 +264,7 @@ start = () => {
 
             if (m.match("^/d")) {
                 if (len >= 25) {
-                    if (user === curPl.n) { plDel(user, m); }
+                    if ((user === curPl.n) || (m.length > 3)) { plDel(user, m); }
                 }
             }
 
