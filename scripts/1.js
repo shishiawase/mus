@@ -225,7 +225,8 @@ start = () => {
                         if (y.id) { plRule(user, y); len = Object.keys(userPlaylist[user].yt).length; }
                         if (times.mode) {
                             clearTimeout(times.play);
-                            bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000));
+                            if (times['mode+']) { bot.music(y.title, y.link, () => times.play = setTimeout(() => plMode(curPl.u), y.time*1000+15000)); }
+                            else bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000));
                         } else { bot.music(y.title, y.link); }
                         if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/s - остановить режим.\n/d - удалить текущий трек.\n/n - следующий."); }
                     });
