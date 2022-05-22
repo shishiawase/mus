@@ -1,6 +1,6 @@
 const { Bot } = require('../lib/bot.js')
 const fs = require('fs')
-const YT = require('../lib/youtube')
+const { YT, PL } = require('../lib/youtube')
 const cmd = require('node-cmd')
 const log = console.log;
 const ytReg = new RegExp("^/m\\s|\\s/m$", "gi");
@@ -94,8 +94,35 @@ plRand = (u) => {
     plRand(u);
 }
 
+plMode = (u) => {
+    clearTimeout(times.play);
+
+    if (!curPl.l) {
+        curPl.n = u.name; curPl.t = u.title; curPl.l = u.yt; curPl.len = u.yt.length;
+        shuffle(curPl.l);
+        curPl.c = 0;
+        bot.print('playlist: ' + curPl.t + '\nauthor: ' + curPl.n);
+    }
+
+    if (curPl.c < curPl.len) {
+        let l = curPl.l[curPl.count];
+
+        YT("https://youtu.be/" + l, a, (y) => {
+            let t = y.time*1000+5000;
+
+            bot.music(y.title, y.link, () => {
+                curPl.c++;
+                times.play = setTimeout(() => plMode(u), t);
+            })
+        }); return;
+    }
+
+    curPl.c = 0;
+    plMode(u);
+}
+
 plStop = () => {
-    times.mode = false;
+    times.mode = false; times['mode+'] = false;
     curPl = {};
 
     clearTimeout(times.play);
@@ -103,6 +130,7 @@ plStop = () => {
 }
 
 plDel = (u) => {
+    if (times['mode+']) { return; }
     let title = userPlaylist[u].yt[curPl.id].title;
 
     delete userPlaylist[u].yt[curPl.id];
@@ -179,10 +207,21 @@ start = () => {
                 }
             }
 
+            if (m.match("^/pl")) {
+                if (times.mode) { bot.print("[playlist mode] - уже активен."); return; }
+                times['mode+'] = true; times.mode = true;
+                curPl = {};
+
+                bot.print("playlist mode ✔️");
+                PL(m.substring(3), (y) => {
+                    plMode(y);
+                });
+            }
+
             if (times.mode) {
 
                 if (m.match("^/s$")) {
-                    if (len >= 25) { plStop(); bot.print("playlist mode ❌"); }
+                    plStop(); bot.print("playlist mode ❌");
                 }
 
                 if (m.match("^/d$")) {
