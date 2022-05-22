@@ -6,6 +6,7 @@ const log = console.log;
 const ytReg = new RegExp("^/m\\s|\\s/m$", "gi");
 const a = process.argv[2];
 const PasteClient = require("pastebin-api").default;
+const client = new PasteClient("qg8xey_GHD36nl02BFVRKs4UihbtC0uO");
 
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
 var times = { mode: false, exit: false };
@@ -61,7 +62,6 @@ randHost = (e) => {
 let curPl = {};
 
 pasteList = async(yt, u, callback) => {
-    const client = new PasteClient("qg8xey_GHD36nl02BFVRKs4UihbtC0uO");
     let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: "/d 1 5 19" (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
 
     Object.keys(yt).forEach((x, i) => {
@@ -226,7 +226,7 @@ start = () => {
                         if (times.mode) {
                             clearTimeout(times.play);
                             if (times['mode+']) { bot.music(y.title, y.link, () => times.play = setTimeout(() => plMode(curPl.u), y.time*1000+15000)); }
-                            else bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000));
+                            else { bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000)); }
                         } else { bot.music(y.title, y.link); }
                         if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/s - остановить режим.\n/d - удалить текущий трек.\n/n - следующий."); }
                     });
