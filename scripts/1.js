@@ -215,73 +215,74 @@ start = () => {
                 if (userPlaylist[user]) {
                     len = Object.keys(userPlaylist[user].yt).length;
                     userPlaylist = JSON.parse(fs.readFileSync("./conf/userPlaylist.json", "utf8"));
-                }
-            }
 
-            if (m.match("/m")) {
-                if (m.match(ytReg)) {
-                    YT(m.replace(ytReg, ""), a, (y) => {
+                    if (m.match("^/i$")) {
+                        if (len >= 25) {
+                            pasteList(userPlaylist[user].yt, u, (link) => {
+                                bot.print(u + " - всего песен [" + len + "].", link);
+                            });
+                        }
+                    }
 
-                        if (y.id) { plRule(user, y); len = Object.keys(userPlaylist[user].yt).length; }
-                        if (times.mode) {
-                            clearTimeout(times.play);
-                            if (times['mode+']) { bot.music(y.title, y.link, () => times.play = setTimeout(() => plMode(curPl.u), y.time*1000+15000)); }
-                            else { bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000)); }
-                        } else { bot.music(y.title, y.link); }
-                        if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/s - остановить режим.\n/d - удалить текущий трек.\n/n - следующий."); }
-                    });
-                }
-            }
+                    if (m.match("^/p$")) {
+                        if (len >= 25) {
+                            if (times.mode) { bot.print("[playlist mode] - уже активен."); return; }
+                            times.mode = true;
+                            curPl = {};
 
-            if (m.match("^/i$")) {
-                if (len >= 25) {
-                    pasteList(userPlaylist[user].yt, u, (link) => {
-                        bot.print(u + " - всего песен [" + len + "].", link);
-                    });
-                }
-            }
+                            plRand(user);
+                            bot.print("playlist mode ✔️");
+                        }
+                    }
 
-            if (m.match("^/p$")) {
-                if (len >= 25) {
-                    if (times.mode) { bot.print("[playlist mode] - уже активен."); return; }
-                    times.mode = true;
-                    curPl = {};
+                    if (m.match("^/d")) {
+                        if (len >= 25) {
+                            if ((user === curPl.n) || (m.length > 3)) { plDel(user, m); }
+                        }
+                    }
 
-                    plRand(user);
-                    bot.print("playlist mode ✔️");
-                }
-            }
+                    if (times.mode) {
 
-            if (m.match("^/pl")) {
-                if (times.mode) { bot.print("[playlist mode] - уже активен."); return; }
-                times['mode+'] = true; times.mode = true;
-                curPl = {};
-
-                bot.print("playlist mode ✔️");
-                PL(m.substring(3), (y) => {
-                    plMode(y);
-                });
-            }
-
-            if (m.match("^/d")) {
-                if (len >= 25) {
-                    if ((user === curPl.n) || (m.length > 3)) { plDel(user, m); }
-                }
-            }
-
-            if (times.mode) {
-
-                if (m.match("^/s$")) {
-                    plStop(); bot.print("playlist mode ❌");
-                }
-
-                if (m.match("^/n$")) {
-                    if (times['mode+']) { plMode(curPl.u); return; }
-                    if (len >= 25) {
-                        if (user === curPl.n) { plRand(user); }
+                        if (m.match("^/n$")) {
+                            if (times['mode+']) { plMode(curPl.u); return; }
+                            if (len >= 25) {
+                                if (user === curPl.n) { plRand(user); }
+                            }
+                        }
                     }
                 }
+
+                if (m.match("/m")) {
+                    if (m.match(ytReg)) {
+                        YT(m.replace(ytReg, ""), a, (y) => {
+
+                            if (y.id) { plRule(user, y); len = Object.keys(userPlaylist[user].yt).length; }
+                            if (times.mode) {
+                                clearTimeout(times.play);
+                                if (times['mode+']) { bot.music(y.title, y.link, () => times.play = setTimeout(() => plMode(curPl.u), y.time*1000+15000)); }
+                                else { bot.music(y.title, y.link, () => times.play = setTimeout(() => plRand(curPl.n), y.time*1000+15000)); }
+                            } else { bot.music(y.title, y.link); }
+                            if (len === 25) { bot.dm(u, "Вам доступен режим плейлиста.\n/i - количество песен.\n/p - включить режим.\n/s - остановить режим.\n/d - удалить текущий трек.\n/n - следующий."); }
+                        });
+                    }
+                }
+
+                if (m.match("^/s$")) {
+                    if (times.mode) { plStop(); bot.print("playlist mode ❌"); }
+                }
+
+                if (m.match("^/pl")) {
+                    if (times.mode) { bot.print("[playlist mode] - уже активен."); return; }
+                    times['mode+'] = true; times.mode = true;
+                    curPl = {};
+
+                    bot.print("playlist mode ✔️");
+                    PL(m.substring(3), (y) => {
+                        plMode(y);
+                    });
+                }
             }
+
         });
 
         bot.event(["new-description"], (u) => {
