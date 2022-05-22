@@ -61,6 +61,7 @@ randHost = (e) => {
 let curPl = {};
 
 pasteList = async(yt, u, callback) => {
+    console.log(yt);
     const client = new PasteClient("qg8xey_GHD36nl02BFVRKs4UihbtC0uO");
     let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: /d 1 5 19 (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
 
