@@ -98,6 +98,7 @@ plMode = (u) => {
     clearTimeout(times.play);
 
     if (!curPl.l) {
+        curPl.u = u;
         curPl.n = u.name; curPl.t = u.title; curPl.l = u.yt; curPl.len = u.yt.length;
         shuffle(curPl.l);
         curPl.c = 0;
@@ -231,6 +232,7 @@ start = () => {
                 }
 
                 if (m.match("^/n$")) {
+                    if (times['mode+']) { plMode(curPl.u); return; }
                     if (len >= 25) {
                         if (user === curPl.n) { plRand(user); }
                     }
