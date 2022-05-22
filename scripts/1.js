@@ -160,9 +160,9 @@ plDel = (u, m) => {
     if (times['mode+']) { return; }
     if (!m.match("^/d$")) {
         let num = m.substring(2).split(/\s/).filter(x => x !== '');
-
+        
         num.forEach(x => Object.keys(userPlaylist[u].yt).find((i, ind) => {
-            if ((ind - 1) === x) { delete userPlaylist[u].yt[i]; }
+            if ((x - 1) === ind) { delete userPlaylist[u].yt[i]; }
         }));
         fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
         bot.print('Песни удалены 🗑️');
