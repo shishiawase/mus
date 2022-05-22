@@ -75,7 +75,7 @@ pasteList = async(yt, u, callback) => {
         publicity: 1,
     });
 
-    return callback(url);
+    return callback('https://pastebin.com/raw/' + url.substring(url.indexOf('com/') + 4));
 }
 
 shuffle = (array) => {
