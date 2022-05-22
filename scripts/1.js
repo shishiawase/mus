@@ -160,8 +160,11 @@ plDel = (u, m) => {
     if (times['mode+']) { return; }
     if (!m.match("^/d$")) {
         let num = m.substring(2).split(/\s/);
+        console.log(num);
 
         num.forEach(x => Object.keys(userPlaylist[u].yt).find((i, ind) => {
+            console.log('item: ' + i, 'ind: ' + ind);
+            console.log('Песня: ' + userPlaylist[u].yt[i]);
             if ((ind + 1) === x) { delete userPlaylist[u].yt[i]; }
         }));
         fs.writeFileSync(`./conf/userPlaylist.json`, JSON.stringify(userPlaylist));
