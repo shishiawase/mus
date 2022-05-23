@@ -77,15 +77,18 @@ pasteList = async(yt, u, callback) => {
         text += (t + b + yt[x].title + '\n');
     });
 
-    const url = await client.createPaste({
-        userKey: token,
-        code: text,
-        expireDate: '10M',
-        name: `${u}.txt`,
-        publicity: 0,
-    });
-
-    return callback('https://pastebin.com/raw/' + url.substring(url.indexOf('com/') + 4));
+    try {
+        const url = await client.createPaste({
+            userKey: token,
+            code: text,
+            expireDate: '10M',
+            name: `${u}.txt`,
+            publicity: 0,
+        });
+        return callback('https://pastebin.com/raw/' + url.substring(url.indexOf('com/') + 4));
+    } catch {
+        return callback(false);
+    }
 }
 
 shuffle = (array) => {
@@ -222,6 +225,7 @@ start = () => {
                     if (m.match("^/i$")) {
                         if (len >= 25) {
                             pasteList(userPlaylist[user].yt, u, (link) => {
+                                if (!link) { link = ''; }
                                 bot.print(u + " - всего песен [" + len + "].", link);
                             });
                         }
