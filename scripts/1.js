@@ -6,7 +6,7 @@ const log = console.log;
 const ytReg = new RegExp("^/m\\s|\\s/m$", "gi");
 const a = process.argv[2];
 const PasteClient = require("pastebin-api").default;
-const client = new PasteClient("qg8xey_GHD36nl02BFVRKs4UihbtC0uO");
+const client = new PasteClient("p2iwxBhoQFSkE877cypALjbt5aF3_6DI");
 
 var bots = JSON.parse(fs.readFileSync("./conf/bots.json", "utf8"));
 var times = { mode: false, exit: false };
@@ -62,6 +62,8 @@ randHost = (e) => {
 let curPl = {};
 
 pasteList = async(yt, u, callback) => {
+    const token = await client.login("drrrdrrrdrrr", "9zgz4uo8atvk2020");
+
     let text = `Список песен пользователя - ${u}.\nЧтобы удалить несколько песен сразу: "/d 1 5 19" (удалит 3 песни с номером 1, 5, 19).\n\n\n\n № | Песня\n\n`;
 
     Object.keys(yt).forEach((x, i) => {
@@ -76,10 +78,11 @@ pasteList = async(yt, u, callback) => {
     });
 
     const url = await client.createPaste({
+        userKey: token,
         code: text,
         expireDate: '10M',
         name: `${u}.txt`,
-        publicity: 1,
+        publicity: 0,
     });
 
     return callback('https://pastebin.com/raw/' + url.substring(url.indexOf('com/') + 4));
