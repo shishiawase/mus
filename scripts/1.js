@@ -163,7 +163,6 @@ plStop = () => {
 }
 
 plDel = (u, m) => {
-    if (times['mode+']) { return; }
     if (!m.match("^/d$")) {
         let num = m.substring(2).split(/\s/).filter(x => x !== '');
 
@@ -174,7 +173,7 @@ plDel = (u, m) => {
         bot.print('Песни удалены 🗑️');
         return;
     }
-
+    if (times['mode+']) { return; }
     if (!times.mode) { return; }
 
     let title = userPlaylist[u].yt[curPl.id].title;
