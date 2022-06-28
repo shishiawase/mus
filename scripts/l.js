@@ -113,7 +113,7 @@ TG.command("all", (ctx) => {
             Object.keys(logs).forEach(x => {
                 bot['pre'] = new Bot();
                 bot['pre'].cookie = logs[x].cookie;
-                bot['pre'].getRoom(() => {
+                bot['pre'].getReady(() => {
                     logs[x]['title'] = bot['pre'].room.name;
                     logs[x]['users'] = bot['pre'].users.map(u => u.name);
                     text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
