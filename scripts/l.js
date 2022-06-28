@@ -121,6 +121,8 @@ TG.command("all", (ctx) => {
     });
 });
 
+TG.launch();
+
 setInterval(() => {
     let bots;
     try { bots = JSON.parse(fs.readFileSync("./conf/l.json", "utf8")); }
