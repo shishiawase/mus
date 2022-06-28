@@ -196,6 +196,13 @@ plRule = (u, y) => {
     }
 }
 
+up = () => {
+    let l = JSON.parse(fs.readFileSync("./conf/l.json", "utf8"));
+    let users = bot.users.map(x => x.name);
+    l[bot.room.roomId] = {'title': bot.room.name, 'users': users, 'cookie': bot.cookie};
+    fs.writeFileSync(`./conf/l.json`, JSON.stringify(l));
+}
+
 start = () => {
 
     if (times.keep) {
@@ -216,10 +223,7 @@ start = () => {
 
     bot.join(a, () => {
         setTimeout(() => times.exit = true, 8500);
-        let l = JSON.parse(fs.readFileSync("./conf/l.json", "utf8"));
-        let users = bot.users.map(x => x.name);
-        l[bot.room.roomId] = {'title': bot.room.name, 'users': users, 'cookie': bot.cookie};
-        fs.writeFileSync(`./conf/l.json`, JSON.stringify(l));
+        up();
 
 
         bot.event(["msg", "dm"], (u, m, url, trip, e) => {
@@ -318,6 +322,10 @@ start = () => {
               del();
             }
           })
+        });
+
+        bot.event(["kick", "leave", "room-profile"], (u) => {
+            up();
         });
     })
 
