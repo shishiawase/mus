@@ -111,7 +111,13 @@ TG.command("all", (ctx) => {
         if (logs) {
             let text = 'Боты\n';
             Object.keys(logs).forEach(x => {
-                text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
+                bot['pre'] = new Bot();
+                bot['pre'].cookie = logs[x].cookie;
+                bot['pre'].getRoom(() => {
+                    logs[x]['title'] = bot['pre'].room.name;
+                    logs[x]['users'] = bot['pre'].users.map(u => u.name);
+                    text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
+                })
             });
             ctx.reply(text, { parse_mode: "Markdown" });
         } else ctx.reply('Ботов нет.', { parse_mode: "Markdown" });
