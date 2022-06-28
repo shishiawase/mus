@@ -1,4 +1,4 @@
-const { Bot } = require('./lib/bot.js')
+const { Bot } = require('../lib/bot.js')
 const fs = require('fs')
 const { Telegraf } = require('telegraf')
 
