@@ -114,10 +114,10 @@ TG.command("all", (ctx) => {
         if (logs) {
             let text = 'Боты\n';
             Object.keys(logs).forEach(x => {
-                text += `\n\nКомната: \`${logs[x].title}\`\nПользователи: \`${logs[x].users.join(', ')}\`\nКуки: \`${logs[x].cookie}\``
+                text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
             });
             ctx.reply(text);
-        } else ctx.reply('Ботов нет.');
+        } else ctx.reply('Ботов нет.', { parse_mode: "Markdown" });
     });
 });
 
@@ -131,7 +131,7 @@ setInterval(() => {
         Object.keys(bots).forEach(x => {
             if (!Object.keys(logs).includes(x)) {
                 logs[x] = bots[x];
-                TG.telegram.sendMessage(db.chatID, `Новый бот запущен\n\nКомната: ${bots[x].title}\nПользователи: ${bots[x].users.join(', ')}\nКуки: ${bots[x].cookie}`);
+                TG.telegram.sendMessage(db.chatID, "Новый бот запущен\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`", { parse_mode: "Markdown" });
             }
         });
         Object.keys(logs).forEach(x => {
