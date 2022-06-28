@@ -100,6 +100,7 @@ TG.command("join", (ctx) => {
 
 TG.command("leave", (ctx) => {
     checkTG(ctx, () => {
+        clearInterval(bot[1].loopID)
         delete bot[1];
         p = '';
         ctx.reply('Бот отключен.');
@@ -139,6 +140,7 @@ setInterval(() => {
             if (!Object.keys(bots).includes(x)) {
                 delete logs[x]
                 if (p && (!Object.keys(logs).includes(p))) {
+                    clearInterval(bot[1].loopID)
                     delete bot[1];
                     p = '';
                     ctx.reply('Бот отключен.')
