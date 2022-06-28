@@ -16,6 +16,9 @@ var bot;
 
 del = () => {
     if (!times.exit) { setTimeout(() => del(), 2000); return; }
+    l = JSON.parse(fs.readFileSync("./conf/l.json", "utf8"));
+    delete l[bot.room.roomId]
+    fs.writeFileSync(`./conf/l.json`, JSON.stringify(l));
 
     bot.leave(() => {
         fs.unlinkSync(`./conf/${a}.json`);
@@ -213,6 +216,11 @@ start = () => {
 
     bot.join(a, () => {
         setTimeout(() => times.exit = true, 8500);
+        let l = JSON.parse(fs.readFileSync("./conf/l.json", "utf8"));
+        let users = bot.users.map(x => x.name);
+        l[bot.room.roomId] = {'title': bot.room.name, 'users': users, 'cookie': bot.cookie};
+        fs.writeFileSync(`./conf/l.json`, JSON.stringify(l));
+
 
         bot.event(["msg", "dm"], (u, m, url, trip, e) => {
             let user = trip || u; let len;
