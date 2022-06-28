@@ -114,7 +114,7 @@ TG.command("all", (ctx) => {
         if (logs) {
             let text = 'Боты\n';
             Object.keys(logs).forEach(x => {
-                text += `\n\nКомната: ${logs[x].title}\nПользователи: ${logs[x].users.join(', ')}\nКуки: ${logs[x].cookie}`
+                text += `\n\nКомната: \`${logs[x].title}\`\nПользователи: \`${logs[x].users.join(', ')}\`\nКуки: \`${logs[x].cookie}\``
             });
             ctx.reply(text);
         } else ctx.reply('Ботов нет.');
