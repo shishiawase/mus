@@ -113,10 +113,11 @@ TG.command("all", (ctx) => {
             Object.keys(logs).forEach(x => {
                 bot['pre'] = new Bot();
                 bot['pre'].cookie = logs[x].cookie;
-                bot['pre'].getReady(() => {});
+                bot['pre'].getReady(() => bot['pre'].startHandle());
                 logs[x]['title'] = bot['pre'].room.name;
                 logs[x]['users'] = bot['pre'].users.map(u => u.name);
                 text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
+                delete bot['pre'];
             });
             ctx.reply(text, { parse_mode: "Markdown" });
         } else ctx.reply('Ботов нет.', { parse_mode: "Markdown" });
