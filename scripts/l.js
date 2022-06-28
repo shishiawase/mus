@@ -107,6 +107,7 @@ TG.command("join", (ctx) => {
 TG.command("leave", (ctx) => {
     checkTG(ctx, () => {
         delete bot;
+        p = '';
         ctx.reply('Бот отключен.');
     });
 });
