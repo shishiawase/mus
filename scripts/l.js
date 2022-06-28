@@ -5,6 +5,7 @@ const { Telegraf } = require('telegraf')
 const db = {'tok': '', 'chatID': ''}
 var TG = new Telegraf(db.tok);
 var logs = {}
+var bot = {}
 var p;
 
 const chars = {
@@ -39,12 +40,6 @@ log2mkd = (type, e, room) => {
     else if (type === "new-host") {
         text += "*" + e.user + "*"; if (e.trip) { text += "`#" + e.trip + "` стал(a) новым хостом." } else text += " стал(a) новым хостом."; return text;
     }
-    else if (type === "kick") {
-        text += "*" + bot.kname + "*"; if (bot.ktrip) { text += "`#" + bot.ktrip + "` был кикнут." } else text += " был кикнут."; return text;
-    }
-    else if (type === "ban") {
-        text += "*" + bot.kname + "*"; if (bot.ktrip) { text += "`#" + bot.ktrip + "` был забанен." } else text += " был забанен."; return text;
-    }
     else if (type === "room-profile") {
         text += "Название комнаты изменено на *" + room.name + "*."; return text;
     }
@@ -69,28 +64,27 @@ checkTG = (ctx, callback) => {
 
 TG.command("join", (ctx) => {
     checkTG(ctx, () => {
-        var bot = {}
         let cookie = ctx.message.text.replace("/join ", "");
-        bot = new Bot();
-        bot.cookie = cookie;
-        bot.getReady(() => bot.startHandle());
-        p = bot.room.roomId;
+        bot[1] = new Bot();
+        bot[1].cookie = cookie;
+        bot[1].getReady(() => bot[1].startHandle());
+        p = bot[1].room.roomId;
         ctx.reply('Бот подключен.');
 
-        bot.event(["msg", "dm", "me", "join", "leave", "new-host", "room-profile", "new-description", "music", "kick", "ban"], (u, m, url, trip, eventObject) => {
-        	if ((eventObject.type === "music") || (u !== bot.profile.name)) {
-                bot.getRoom(() => {
+        bot[1].event(["msg", "dm", "me", "join", "leave", "new-host", "room-profile", "new-description", "music", "kick", "ban"], (u, m, url, trip, eventObject) => {
+        	if ((eventObject.type === "music") || (u !== bot[1].profile.name)) {
+                bot[1].getRoom(() => {
                     let title = "";
                     let url = "";
 
-                    if (bot.room.np) {
-                        title = bot.room.np.name;
-                        url = bot.room.np.url;
+                    if (bot[1].room.np) {
+                        title = bot[1].room.np.name;
+                        url = bot[1].room.np.url;
                     }
 
                     room = {
-                        name: bot.room.name,
-                        desc: bot.room.description,
+                        name: bot[1].room.name,
+                        desc: bot[1].room.description,
                         music: {
                             name: title,
                             url: url
@@ -106,7 +100,7 @@ TG.command("join", (ctx) => {
 
 TG.command("leave", (ctx) => {
     checkTG(ctx, () => {
-        delete bot;
+        delete bot[1];
         p = '';
         ctx.reply('Бот отключен.');
     });
@@ -141,7 +135,7 @@ setInterval(() => {
             if (!Object.keys(bots).includes(x)) {
                 delete logs[x]
                 if (p && (!Object.keys(logs).includes(p))) {
-                    delete bot;
+                    delete bot[1];
                     p = '';
                     ctx.reply('Бот отключен.')
                 }
