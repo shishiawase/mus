@@ -110,6 +110,10 @@ TG.command("all", (ctx) => {
     checkTG(ctx, () => {
         if (logs) {
             let text = 'Боты\n';
+            let bots; try { bots = JSON.parse(fs.readFileSync("./conf/l.json", "utf8")); }
+            Object.keys(bots).forEach(x => {
+                logs[x] = bots[x];
+            });
             Object.keys(logs).forEach(x => {
                 text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
             });
