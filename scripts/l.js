@@ -5,7 +5,7 @@ const { Telegraf } = require('telegraf')
 const db = {'tok': '', 'chatID': ''}
 var TG = new Telegraf(db.tok);
 var logs = {}
-var bot = {}
+var p;
 
 const chars = {
   "_": "\\_",
@@ -69,10 +69,12 @@ checkTG = (ctx, callback) => {
 
 TG.command("join", (ctx) => {
     checkTG(ctx, () => {
+        var bot = {}
         let cookie = ctx.message.text.replace("/join ", "");
         bot = new Bot();
         bot.cookie = cookie;
         bot.getReady(() => bot.startHandle());
+        p = bot.room.roomId;
         ctx.reply('Бот подключен.');
 
         bot.event(["msg", "dm", "me", "join", "leave", "new-host", "room-profile", "new-description", "music", "kick", "ban"], (u, m, url, trip, eventObject) => {
@@ -104,7 +106,7 @@ TG.command("join", (ctx) => {
 
 TG.command("leave", (ctx) => {
     checkTG(ctx, () => {
-        bot = {};
+        delete bot;
         ctx.reply('Бот отключен.');
     });
 });
@@ -116,7 +118,7 @@ TG.command("all", (ctx) => {
             Object.keys(logs).forEach(x => {
                 text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
             });
-            ctx.reply(text);
+            ctx.reply(text, { parse_mode: "Markdown" });
         } else ctx.reply('Ботов нет.', { parse_mode: "Markdown" });
     });
 });
@@ -137,6 +139,11 @@ setInterval(() => {
         Object.keys(logs).forEach(x => {
             if (!Object.keys(bots).includes(x)) {
                 delete logs[x]
+                if (p && (!Object.keys(logs).includes(p))) {
+                    delete bot;
+                    p = '';
+                    ctx.reply('Бот отключен.')
+                }
             }
         });
     }
