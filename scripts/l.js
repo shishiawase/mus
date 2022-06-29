@@ -72,28 +72,26 @@ TG.command("join", (ctx) => {
         ctx.reply('Бот подключен.');
 
         bot[1].event(["msg", "dm", "me", "join", "leave", "new-host", "room-profile", "new-description", "music", "kick", "ban"], (u, m, url, trip, eventObject) => {
-        	if ((eventObject.type === "music") || (u !== bot[1].profile.name)) {
-                bot[1].getRoom(() => {
-                    let title = "";
-                    let url = "";
+            bot[1].getRoom(() => {
+                let title = "";
+                let url = "";
 
-                    if (bot[1].room.np) {
-                        title = bot[1].room.np.name;
-                        url = bot[1].room.np.url;
+                if (bot[1].room.np) {
+                    title = bot[1].room.np.name;
+                    url = bot[1].room.np.url;
+                }
+
+                room = {
+                    name: bot[1].room.name,
+                    desc: bot[1].room.description,
+                    music: {
+                        name: title,
+                        url: url
                     }
+                };
 
-                    room = {
-                        name: bot[1].room.name,
-                        desc: bot[1].room.description,
-                        music: {
-                            name: title,
-                            url: url
-                        }
-                    };
-
-                    sendTg(db.chatID, eventObject.type, eventObject, room);
-                })
-        	}
+                sendTg(db.chatID, eventObject.type, eventObject, room);
+            })
         });
     })
 });
@@ -110,15 +108,20 @@ TG.command("leave", (ctx) => {
 TG.command("all", (ctx) => {
     checkTG(ctx, () => {
         if (logs) {
-            let text = 'Боты\n';
-            let bots; try { bots = JSON.parse(fs.readFileSync("./conf/l.json", "utf8")); } catch {}
-            Object.keys(bots).forEach(x => {
-                logs[x] = bots[x];
-            });
+            let tex = 'Боты\n';
             Object.keys(logs).forEach(x => {
-                text += ("\n\nКомната: `" + logs[x].title + "`\nПользователи: `" + logs[x].users.join(', ') + "`\nКуки: `" + logs[x].cookie + "`");
+                bot[2] = new Bot();
+                bot[2].cookie = logs[x].cookie;
+                bot[2].getLoc(() => {
+                    up = () => {
+                        try {tex += ("\n\nКомната: `" + bot[2].room.name + "`\nПользователи: `" + bot[2].users.map(u => u.name).join(', ') + "`\nКуки: `" + bot[2].cookie + "`");}
+                        catch { up(); }
+                    }
+                    up();
+                });
+                delete bot[2];
             });
-            ctx.reply(text, { parse_mode: "Markdown" });
+            ctx.reply(tex, { parse_mode: "Markdown" });
         } else ctx.reply('Ботов нет.', { parse_mode: "Markdown" });
     });
 });
@@ -143,7 +146,7 @@ setInterval(() => {
                     clearInterval(bot[1].loopID)
                     delete bot[1];
                     p = '';
-                    ctx.reply('Бот отключен.')
+                    TG.telegram.sendMessage(db.chatID, 'Бот отключен.');
                 }
             }
         });

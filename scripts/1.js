@@ -323,11 +323,7 @@ start = () => {
             }
           })
         });
-
-        bot.event(["kick", "leave", "room-profile"], (u) => {
-            up();
-        });
-    })
+    });
 
   }
 
