@@ -83,12 +83,4 @@ logFunc = () => {
   }
 }
 
-cmd.run(`pm2 start node --name "L" -- ./scripts/l.js`, (err, a, b) => {
-  if (!err) {
-    log('L - ok');
-  } else {
-    log('error L');
-  }
-})
-
 logFunc();
