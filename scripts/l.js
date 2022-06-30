@@ -144,7 +144,7 @@ setInterval(() => {
             }
         });
         Object.keys(logs).forEach(x => {
-            if (!Object.keys(b).includes(x)) {
+            if (!Object.keys(bots).includes(x)) {
                 delete logs[x]
                 if (p && (!Object.keys(logs).includes(p))) {
                     stop();
