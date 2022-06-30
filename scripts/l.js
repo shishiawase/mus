@@ -62,6 +62,13 @@ checkTG = (ctx, callback) => {
     }
 }
 
+stop = () => {
+    clearInterval(bot[1].loopID);
+    delete bot[1];
+    p = '';
+    TG.telegram.sendMessage(db.chatID, 'Бот отключен.');
+}
+
 TG.command("join", (ctx) => {
     checkTG(ctx, () => {
         let cookie = ctx.message.text.replace("/join ", "");
@@ -137,15 +144,17 @@ setInterval(() => {
             }
         });
         Object.keys(logs).forEach(x => {
-            if (!Object.keys(bots).includes(x)) {
+            if (!Object.keys(b).includes(x)) {
                 delete logs[x]
                 if (p && (!Object.keys(logs).includes(p))) {
-                    clearInterval(bot[1].loopID)
-                    delete bot[1];
-                    p = '';
-                    TG.telegram.sendMessage(db.chatID, 'Бот отключен.');
+                    stop();
                 }
             }
         });
+    } else {
+        if (p) {
+            logs = {};
+            stop();
+        }
     }
 }, 5000)
